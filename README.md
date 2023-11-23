@@ -4,6 +4,8 @@
 
 ## This repository is a rip-off of [Akshat-Jain](https://github.com/Akshat-Jain/database-internals-notes#what-is-this)’s notes from reading Database Internals by Alex Petrov as well as my own thoughts and findings from the book and other related materials.
 
+---
+
 ### Table Of Contents
 
 ### PART 1: Storage Engines

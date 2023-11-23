@@ -2,15 +2,16 @@
 
 ![71uJFctCDFL._AC_UF1000,1000_QL80_.jpg](71uJFctCDFL._AC_UF10001000_QL80_.jpg)
 
-## This repository is a rip-off of [Akshat-Jain](https://github.com/Akshat-Jain/database-internals-notes#what-is-this)’s notes from reading Database Internals by Alex Petrov as well as my own thoughts and findings from the book and other related materials.
+This repository is a rip-off of [Akshat-Jain](https://github.com/Akshat-Jain/database-internals-notes#what-is-this)’s notes from reading Database Internals by Alex Petrov as well as my own thoughts and findings from the book and other related materials.
 
----
+--
+
 
 ### Table Of Contents
 
 ### PART 1: Storage Engines
 
-- [Chapter 1: Introduction and Overview]()
+- [Chapter 1: Introduction and Overview](https://github.com/adetunjii/database-internals-notes/blob/master/Part%201%3A%20Storage%20Engines/Chapter%201%20-%20Introduction%20and%20Overview.md)
 
 ### What can you expect from this repository?
 

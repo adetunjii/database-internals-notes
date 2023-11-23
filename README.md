@@ -2,9 +2,10 @@
 
 ![71uJFctCDFL._AC_UF1000,1000_QL80_.jpg](71uJFctCDFL._AC_UF10001000_QL80_.jpg)
 
----
 
 This repository is a rip-off [Akshat-Jain](https://github.com/Akshat-Jain/database-internals-notes#what-is-this)’s notes from reading Database Internals by Alex Petrov as well as my own thoughts and findings from the book and other related materials.
+
+---
 
 ### Table Of Contents
 

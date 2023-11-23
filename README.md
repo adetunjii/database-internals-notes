@@ -15,7 +15,7 @@ This repository is a rip-off of [Akshat-Jain](https://github.com/Akshat-Jain/dat
 
 ### What can you expect from this repository?
 
-1. We plan on reading a chapter per week. I will try my best to update this repository with my notes from the chapter every week.
+1. I plan on reading a chapter per week. I will try my best to update this repository with my notes from the chapter every week.
 2. I will try to keep the notes as concise as possible, while also trying to cover all the important points.
 3. You can expect to find some additional information that I found interesting, or some side learning that I did while reading the chapter. I'd put them with a ✨ **Side learning** label. These are not in the book, not in that chapter at least.
 4. You can expect a 1:1 mapping of the chapter with the notes. I will try to keep the notes in the same order as the chapter.

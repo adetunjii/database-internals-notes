@@ -2,17 +2,13 @@
 
 ![71uJFctCDFL._AC_UF1000,1000_QL80_.jpg](71uJFctCDFL._AC_UF10001000_QL80_.jpg)
 
----
-
-This repository is a rip-off [Akshat-Jain](https://github.com/Akshat-Jain/database-internals-notes#what-is-this)’s notes from reading Database Internals by Alex Petrov as well as my own thoughts and findings from the book and other related materials.
+## This repository is a rip-off of [Akshat-Jain](https://github.com/Akshat-Jain/database-internals-notes#what-is-this)’s notes from reading Database Internals by Alex Petrov as well as my own thoughts and findings from the book and other related materials.
 
 ### Table Of Contents
 
 ### PART 1: Storage Engines
 
-- Chapter 1: Introduction and Overview
-- Chapter 2: B-tree Basics
-- Chapter 3: File Formats
+- [Chapter 1: Introduction and Overview]()
 
 ### What can you expect from this repository?
 
@@ -34,4 +30,4 @@ Each chapter would contain a **Key takeaways** section as the parts that I find 
 
 ## Motivation
 
-My motivation comes from the urge to know more about databases especially now that I’m actively contributing to [FerretDB](https://github.com/FerretDB/FerretDB). I’m trying to get to know more about database architectures and how databases work under the hood as this would help me make better informed decisions. I also hope to discover a couple things from this book that might be beneficial to FerretDB and help improve it’s overall performance.
+My motivation comes from the urge to know more about database systems especially now that I’m actively contributing to [FerretDB](https://github.com/FerretDB/FerretDB). I’m trying to get to know more about database architectures and how databases work under the hood as this would help me make better informed decisions on certain things that I'm working on. I also hope to discover a couple things from this book that might be beneficial to FerretDB and help improve it’s overall performance.

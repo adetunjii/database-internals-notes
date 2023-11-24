@@ -1,6 +1,6 @@
 # Chapter 1: Introduction and Overview
 
-Database system == client/server model == database nodes are the servers + applications that use the database are the clients.
+Database system uses a client/server model i.e database nodes are the servers + applications that use the database are the clients.
 
 ## Database Architecture
 
@@ -71,6 +71,7 @@ databases(Categories of Databases)
 use_case(Use case)
 storage_medium(Storage Medium)
 storage_layout(Storage Layout)
+structure(Structure)
 
 %% Use case
 OLTP("Online Transaction Processing (OLTP)")
@@ -85,10 +86,15 @@ InMemory(In-memory)
 Row(Row-Oriented)
 Column(Column-Oriented)
 
-databases --> use_case & storage_medium & storage_layout
+%% Structure
+SQL
+NOSQL
+
+databases --> use_case & storage_medium & storage_layout & structure
 use_case --> OLTP & OLAP & HTAP
 storage_medium --> Disk & InMemory
 storage_layout --> Row & Column
+structure --> SQL & NOSQL
 ```
 
 ## OLTP vs OLAP vs HTAP Databases
@@ -121,8 +127,8 @@ Since in-memory databases are volatile, they need to be made durable. This is do
 
 It has 2 components:
 
-1. **Sequential log file:** Before any operation is called successful, the database must ensure that the data is written to a sequential log file. This is done by using a technique called _write-ahead logging_, which is a topic for a future chapter.
-2. **Backup copy:** Another thing we store on disk is a _backup copy_ of the database. The "checkpointer" is a component of recovery manager that is responsible for maintaining a backup copy of the database in an almost up-to-date state. (Source / Good read: https://pages.cs.wisc.edu/~vijayan/ra/papers/checkpointing-memory-resident-db.pdf)
+1. **Sequential log file:** Before any operation is complete, the results of the operation must be written to a sequential log file. This is done by using a technique called _write-ahead logging_, which is a topic for a future chapter.
+2. **Backup copy:** Another thing we store on disk is a _backup copy_ of the database. The backup copy is maintained as a sorted disk-based structure. The "checkpointer" is a component of recovery manager that is responsible for maintaining a backup copy of the database in an almost up-to-date state. (Source / Good read: https://pages.cs.wisc.edu/~vijayan/ra/papers/checkpointing-memory-resident-db.pdf)
 
 **How do these 2 components work together?**
 
@@ -191,7 +197,10 @@ age=20, 21
 
 Data in disk is stored block-wise.
 
-> Block is a minimal unit of data that can be read from or written to disk.
+- For Row oriented databases, entire rows are written on to blocks of the disk.
+- For Column oriented databases, entire columns are written on to blocks of the disk.
+
+> A **block** is an intersection of a track and sector on a disk which holds the data. It's typically 512 bytes but this varies now.
 
 Queries like `SELECT name FROM users` would be faster in column oriented databases because we don't have to read the entire row, we just have to read the name column. This is because the different values for the column are stored together in the disk, hence we have to read less number of blocks. (ofcourse not for just 2 teeny tiny records, but you get the idea!)
 
@@ -209,6 +218,8 @@ Reading multiple values for same column in one run has some other interesting as
 2. This has a better compression ratio.
 3. This improves vectorization.
 
+> To determine whether to use a column- or row-oriented database, you need to consider how the data would be accessed. If the data is consumed in records and most of the columns are requested and the workload consists mostly of point queries and range scans, then use a row-oriented database. On the other hand, if scans span many rows, or compute aggregate over a subset of columns, then use a column-oriented database.
+
 ## Wide column stores
 
 Examples: BigTable, HBase
@@ -219,26 +230,38 @@ I don't fully understand the practical use-cases of this. I wasn't able to get g
 
 ## Data Files and Index Files
 
-This was the most confusing part of the chapter for me. I'll try to explain it as best as I can. Please correct me if I'm wrong.
-
 This is about how data is organized on disk. 2 types of files are used:
 
-1. Data files: These contain the actual data.
+1. Data files: are files on the disk that holds the records of a database. A data file is created per table (or related grouping. e.g collection of documents)
 2. Index files: These contain the metadata for records of data files, to help us find the data we want efficiently.
 
 Files are partitioned into pages. 1 page == one or many disk "blocks".
 
+### How data is accessed and stored in disk-based storage
+
+Data access is usually done through a mix of disk and memory interactions. When data is requested, the disk I/O subsystem retrieves the relevant pages of data (blocks of data) from the disk and loads it into a part of the memory called a buffer pool. This part of the memory is managed by the database system (storage manager). The execution engine interacts with the data in the memory buffer pool.
+
+> The **storage manager** is a component of the database storage engine. It is responsible for retrieving data pages from the disk and loading it up into the buffer pool. It is also responsible for the direct management and manipulation of the buffer pool.
+
 ### Data Files
+
+Database systems do not use the traditional filesystems and directories for storing and locating records, instead, they have specialized file formats and structures that help to efficiently store and locate records in these files.
+
+Reasons why specialized file organization is used over flat files:
+
+1. Storage efficiency: Records need to be stored in a way that reduces the storage overhead
+2. Access Efficiency: Records need to be located as quickly as possible.
+3. Update efficiency: Record updates are performed in a way that minimizes the number of changes on disk.
 
 Data files can be organized in 3 ways:
 
-1. Heap files: Data is stored in an unordered manner, mostly in a write-order.
+1. Heap files: Data is stored in an unordered manner, mostly in a write-order. New records are simply appended to the end of the file.
 2. Hash files: Bucketed approach of storing data. Hash of the key is used to determine the bucket in which the data is stored.
 3. Index organized tables (IOT): Data is stored in the index itself.
 
 Depending on the type of data file, the index file can have different contents (called "data entries"):
 
-1. Heap files: Index file contains the file offsets (row locators).
+1. Heap files: Index file contains the file offsets (row locators) + location of data records in the data file.
 2. Hash files: Index file contains the bucket IDs.
 3. Index organized tables (IOT): Index file contains the primary key.
 
@@ -248,9 +271,25 @@ An index is a data structure that helps us find the data we want efficiently.
 
 Types of index: Index on data file (primary file) is called **primary index** (also called primary index if it is on a composite primary key). All other indexes are called **secondary**.
 
-Clustered vs non-clustered index: If the data is stored in the same order as the index, it is called a clustered index. Otherwise, it is called an non-clustered index.
+1. **Clustered index**: If the data is stored in the same order as the index, it is called a clustered index. A clustered index affects the physical ordering of the rows in a table. For example:
 
-The above differences are explained quite confusingly in the book. I'll update this section if I find a better explanation. I'm hopeful that chapter 2 will clear things up, as it has a lot of examples around this area.
+   | id  | name       | department | salary |
+   | --- | ---------- | ---------- | ------ |
+   | 100 | John Doe   | Sales      | 50000  |
+   | 101 | Jane smith | Sales      | 50000  |
+   | 102 | Mike shaw  | Sales      | 50000  |
+
+   Suppose an update happens, employee with id 101 changes to 110, what a clustered index would do, would be to physically move the entire row to the appropriate position on the table.
+
+   PROS:
+
+   - Retrieving rows is faster because the data is physically organized based on the indexed columns. Queries that use the clustered index key can benefit from sequential reads and quickly retrieve rows.
+
+   CONS:
+
+   - Leads to more overhead during updates since the rows have to be physically re-ordered.
+
+2. **Non-clustered index**: Here the indexes store pointers and references to actual rows in the table.
 
 ## Primary index as an indirection
 
@@ -272,51 +311,10 @@ Storage structures have 3 variables:
 
 1. Buffering: Whether the data is buffered in memory before being written to disk.
 2. Immutability: Whether the data is updated in-place (mutable) or it's append-only (immutable).
-3. Ordering: Whether the data is stored in the key order or not.
-
-## Pending Doubts
-
-1. Is the "Lifecycle of a query" part above correct? (Especially in the 2nd half of the cycle where response is to be returned)
-
-[Update] Answer: Yes, it is correct.
-
-Drop me an email if you would like to answer any of the doubts, or discuss: [Let's talk!](mailto:me@akjn.dev?subject=[Chapter%201]%20Doubts)
+3. Ordering: Whether the data is stored in the key orderd or not.
 
 ## Things to Read
 
 1. NVM storage - current state, timelines, benchmarks, etc
 2. Vector instructions / Vectorization in column oriented databases
 3. Wide column stores - use cases, practical examples, etc
-
-## Reading group discussion
-
-This section contains anything worth mentioning that came up as part of the weekly reading group discussion.
-
-1. What is a possible migration plan from Database-A to Database-B ?
-
-   i. A very interesting story of a migration from Couchbase to Aerospike: [Large Scale NoSQL Database Migration Under Fire](https://medium.com/appsflyerengineering/large-scale-nosql-database-migration-under-fire-bf298c3c2e47)
-
-   ii. [Online migrations at scale](https://stripe.com/blog/online-migrations)
-
-2. If you wonder about the rationale behind design decision of DBs implementing their own data cache (buffer pools), and forgoing pagecache of OS and using direct I/O on underlying filesystem, here's a good paper by Andy Pavlo: https://db.cs.cmu.edu/papers/2022/cidr2022-p13-crotty.pdf
-
-3. Request lifecycle
-
-An interesting example was mentioned by someone on my doubt on request lifecycle.
-
-Once you arrive at the execution engine, it's not so linear.
-
-As an example, take `SELECT * FROM foo WHERE bar IN (SELECT bar FROM boop)`.
-
-The execution engine will end up with a plan like:
-
-```
-1. Read table boop's bar field into List A.
-2. Sort List A (to make step 4's search faster).
-3. Read each row from table foo.
-4. Emit each all the fields from foo into the result set if foo.bar in List A.
-```
-
-So we would have the execution engine reading from the storage engine in (1), doing some internal processing, then going back out to the storage engine to read table foo's rows in step (3). There's an interaction between the two of them as execution proceeds. As we increase complexity of queries, introduce indexes, etc etc etc, it's very easily going to get complicated. We might even have several storage engines involved in a single query (eg, indexes and primary data in different engines).
-
-Step 4 might emit the rows directly to the client, or it might buffer them before returning. If there's a sort, group etc. involved it might _have_ to buffer the results.
